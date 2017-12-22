@@ -1,0 +1,108 @@
+
+==================================================
+frequent 1-itemsets             support
+==================================================
+frozenset({'LGPL'}) 0.07579015265534293
+frozenset({'Perl'}) 0.09124919372178027
+frozenset({'Web'}) 0.1347452160825629
+frozenset({'Dynamic Content'}) 0.06878090733175661
+frozenset({'Communications'}) 0.09567834874220597
+frozenset({'Mac OS X'}) 0.1036981294345302
+frozenset({'PHP'}) 0.11722210277359707
+frozenset({'Utilities'}) 0.07090948183186412
+frozenset({'Windows'}) 0.16280369812943454
+frozenset({'Java'}) 0.13747581165340786
+frozenset({'Unix'}) 0.10965383788432595
+frozenset({'OS Independent'}) 0.21887766071812514
+frozenset({'C'}) 0.22128574500107503
+frozenset({'multimedia'}) 0.1035261234143195
+frozenset({'GPLv3'}) 0.061836164265749304
+frozenset({'C++'}) 0.12670393463771232
+frozenset({'Networking'}) 0.060653622876800685
+frozenset({'BSD'}) 0.05368737905826704
+frozenset({'Scientific/Engineering'}) 0.057600516018060634
+frozenset({'Internet'}) 0.1741560954633412
+frozenset({'Software Development'}) 0.20681573855084928
+frozenset({'Libraries'}) 0.12341431950118253
+frozenset({'GPL'}) 0.45542894001290046
+frozenset({'POSIX'}) 0.36282519888196085
+frozenset({'Linux'}) 0.3502042571490002
+frozenset({'Python'}) 0.09010965383788433
+frozenset({'English'}) 0.12900451515803052
+frozenset({'Games/Entertainment'}) 0.05435390238658353
+frozenset({'Desktop Environment'}) 0.05020425714900022
+==================================================
+frequent 2-itemsets             support
+==================================================
+frozenset({'GPL', 'Software Development'}) 0.07136099763491723
+frozenset({'Unix', 'POSIX'}) 0.050010750376263166
+frozenset({'English', 'Linux'}) 0.05723500322511288
+frozenset({'Linux', 'C++'}) 0.07370457966028811
+frozenset({'Unix', 'Linux'}) 0.05362287680068802
+frozenset({'POSIX', 'multimedia'}) 0.05459041066437325
+frozenset({'Java', 'Software Development'}) 0.050741775962158675
+frozenset({'OS Independent', 'Java'}) 0.07387658568049882
+frozenset({'OS Independent', 'Web'}) 0.05600946033111159
+frozenset({'POSIX', 'Internet'}) 0.06089013115459041
+frozenset({'Internet', 'GPL'}) 0.08682003870135455
+frozenset({'POSIX', 'C++'}) 0.07529563534723716
+frozenset({'GPL', 'multimedia'}) 0.06198666953343367
+frozenset({'OS Independent', 'GPL'}) 0.09471081487852075
+frozenset({'PHP', 'GPL'}) 0.05108578800258009
+frozenset({'OS Independent', 'Internet'}) 0.06465276284669963
+frozenset({'Mac OS X', 'Linux'}) 0.06394323801333046
+frozenset({'POSIX', 'Linux'}) 0.25592345732100624
+frozenset({'Libraries', 'Software Development'}) 0.12122124274349602
+frozenset({'Linux', 'C'}) 0.1215437540313911
+frozenset({'GPL', 'C++'}) 0.06265319286175017
+frozenset({'Windows', 'GPL'}) 0.05600946033111159
+frozenset({'Windows', 'POSIX'}) 0.09604386153515374
+frozenset({'POSIX', 'C'}) 0.14955923457321008
+frozenset({'Linux', 'Software Development'}) 0.05022575790152655
+frozenset({'GPL', 'Linux'}) 0.17282304880670823
+frozenset({'Internet', 'Web'}) 0.12853149860245108
+frozenset({'Mac OS X', 'Windows'}) 0.06731885615996559
+frozenset({'POSIX', 'GPL'}) 0.21649107718770158
+frozenset({'GPL', 'Web'}) 0.06237368307890776
+frozenset({'POSIX', 'Software Development'}) 0.0753171360997635
+frozenset({'Windows', 'Linux'}) 0.11354547409159321
+frozenset({'GPL', 'C'}) 0.11917867125349388
+frozenset({'Dynamic Content', 'Web'}) 0.06817888626101913
+frozenset({'Internet', 'Dynamic Content'}) 0.06822188776607181
+frozenset({'OS Independent', 'Software Development'}) 0.07667168350892281
+frozenset({'Communications', 'GPL'}) 0.055428940012900454
+==================================================
+frequent 3-itemsets             support
+==================================================
+frozenset({'POSIX', 'GPL', 'C'}) 0.09382928402494087
+frozenset({'Internet', 'Dynamic Content', 'Web'}) 0.06807138249838744
+frozenset({'OS Independent', 'Internet', 'Web'}) 0.05416039561384649
+frozenset({'POSIX', 'GPL', 'Linux'}) 0.1587615566544829
+frozenset({'Internet', 'GPL', 'Web'}) 0.06187916577080198
+frozenset({'POSIX', 'Linux', 'C'}) 0.09952698344442056
+frozenset({'POSIX', 'Windows', 'Linux'}) 0.07127499462481186
+frozenset({'GPL', 'Linux', 'C'}) 0.07093098258439046
+frozenset({'POSIX', 'Linux', 'C++'}) 0.05637497312405934
+
+Big Rules
+frozenset({'Linux'}) => frozenset({'POSIX'}) conf:  0.7307833988212181
+frozenset({'POSIX'}) => frozenset({'Linux'}) conf:  0.705362962962963
+frozenset({'Libraries'}) => frozenset({'Software Development'}) conf:  0.9822299651567945
+frozenset({'Internet'}) => frozenset({'Web'}) conf:  0.7380246913580247
+frozenset({'Web'}) => frozenset({'Internet'}) conf:  0.9538854316259773
+frozenset({'Dynamic Content'}) => frozenset({'Web'}) conf:  0.9912472647702406
+frozenset({'Dynamic Content'}) => frozenset({'Internet'}) conf:  0.9918724601437949
+frozenset({'GPL', 'C'}) => frozenset({'POSIX'}) conf:  0.7872992964098863
+frozenset({'Internet', 'Dynamic Content'}) => frozenset({'Web'}) conf:  0.9977938859123857
+frozenset({'Dynamic Content', 'Web'}) => frozenset({'Internet'}) conf:  0.9984232103437402
+frozenset({'Dynamic Content'}) => frozenset({'Internet', 'Web'}) conf:  0.9896842763363551
+frozenset({'OS Independent', 'Internet'}) => frozenset({'Web'}) conf:  0.8377120053209179
+frozenset({'OS Independent', 'Web'}) => frozenset({'Internet'}) conf:  0.9669865642994243
+frozenset({'GPL', 'Linux'}) => frozenset({'POSIX'}) conf:  0.9186364767355064
+frozenset({'POSIX', 'GPL'}) => frozenset({'Linux'}) conf:  0.7333399543152249
+frozenset({'Internet', 'GPL'}) => frozenset({'Web'}) conf:  0.7127290737989104
+frozenset({'GPL', 'Web'}) => frozenset({'Internet'}) conf:  0.9920716994139952
+frozenset({'C', 'Linux'}) => frozenset({'POSIX'}) conf:  0.8188572439412701
+frozenset({'POSIX', 'Windows'}) => frozenset({'Linux'}) conf:  0.7421087978509066
+frozenset({'C++', 'Linux'}) => frozenset({'POSIX'}) conf:  0.76487747957993
+frozenset({'POSIX', 'C++'}) => frozenset({'Linux'}) conf:  0.7487150199885779
