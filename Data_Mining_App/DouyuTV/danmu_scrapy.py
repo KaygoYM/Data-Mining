@@ -23,12 +23,18 @@ host = socket.gethostbyname("openbarrage.douyutv.com")
 port = 8601
 client.connect((host, port))
 #setsockopt(client,SOL_SOCKET,SO_KEEPALIVE,true)
-
+'''
 danmu_path = re.compile(b'txt@=(.+?)/cid@')
 uid_path = re.compile(b'uid@=(.+?)/nn@')
 nickname_path = re.compile(b'nn@=(.+?)/txt@')
 level_path = re.compile(b'level@=([1-9][0-9]?)/sahf')
-
+badgename_path = re.compile(b'bnn@=(.+?)/bl@')
+'''
+danmu_path = re.compile(b'txt@=(.+?)/')
+uid_path = re.compile(b'uid@=(.+?)/')
+nickname_path = re.compile(b'nn@=(.+?)/')
+level_path = re.compile(b'level@=([1-9][0-9]?)/')
+badgename_path = re.compile(b'bnn@=(.+?)/')
 
 def sendmsg(msgstr):
     msg = msgstr.encode('utf-8')
@@ -57,6 +63,7 @@ def starting(roomid):
         nickname_more = nickname_path.findall(data)
         level_more = level_path.findall(data)
         danmu_more = danmu_path.findall(data)
+        badgename_more=badgename_path.findall(data)
         #print(data)
         if not level_more:
             level_more = b'0'
@@ -68,13 +75,30 @@ def starting(roomid):
         else:
             for i in range(0, len(danmu_more)):
                 try:
+                    product={'uid':uid_more[i].decode(errors='ignore'),
+                             'nickname':nickname_more[i].decode(errors='ignore'),
+                             'level':level_more[i].decode(errors='ignore'),
+                             'danmu':danmu_more[i].decode(errors='ignore'),
+                             'badge':badgename_more[i].decode(errors='ignore')
+                             }
+                    lines=[uid_more[i].decode(errors='ignore')+' ',
+                           nickname_more[i].decode(errors='ignore')+' ',
+                           level_more[i].decode(errors='ignore')+' ',
+                           danmu_more[i].decode(errors='ignore')+' ',
+                           badgename_more[i].decode(errors='ignore')]
+                    '''
                     product={'uid':uid_more[i].decode(),
                              'nickname':nickname_more[i].decode(),
                              'level':level_more[i].decode(),
-                             'danmu':danmu_more[i].decode()
+                             'danmu':danmu_more[i].decode(),
+                             'badge':badgename_more[i].decode()
                              }
-                    lines=[uid_more[i].decode()+' ',nickname_more[i].decode()+' ',
-                           level_more[i].decode()+' ',danmu_more[i].decode()+' ']
+                    lines=[uid_more[i].decode()+' ',
+                           nickname_more[i].decode()+' ',
+                           level_more[i].decode()+' ',
+                           danmu_more[i].decode()+' ',
+                           badgename_more[i].decode()]
+                    '''
                     my_file=open(str(roomid)+'.txt','a+')
                     my_file.writelines(lines)
                     my_file.write('\n')
@@ -113,9 +137,3 @@ if __name__ == '__main__':
         p1.start()
         p1.join()
         print("p1:",p1.is_alive())
-        '''
-            txt = np.loadtxt(str(room_id)+'.txt')
-            txtDF = pd.DataFrame(txt)
-            txtDF.to_csv(str(room_id)+'file.csv',index=False)
-            print("CSV is created")
-        '''
