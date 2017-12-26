@@ -27,26 +27,28 @@ def main():
     nickname varchar(1024),\
     level varchar(128),\
     content varchar(2048),\
-    badge varchar(1024))DEFAULT CHARSET gbk"
+    badge varchar(1024),\
+    blevel varchar(128))DEFAULT CHARSET gbk"
     
     cursor.execute(sql)
     cursor.execute('delete from %s'%(table_name,))
-    while True:  
-        line = txt.readline().strip('\n')#按行读取且处理掉换行符，效果:"\'\n'变为了''
+    danmulist=[]
+    for line in txt.readlines():#按行读取且处理掉换行符，效果:"\'\n'变为了''
         #line = line.encode('utf8')
-        if line:  
-            #print(line.split(','))  
-            list_danmu = line.split(' ')#数据以逗号分隔，因此用split(',')
-            list_danmu=[i.encode('gbk') for i in list_danmu]
-            try:
-                insertcolumn_full='INSERT INTO %s'%(table_name,)+' VALUES (%s,%s,%s,%s,%s)'
-                cursor.execute(insertcolumn_full,tuple(list_danmu))#运行  
-            except Exception as e:
-                #print(e)
-                continue
-            db.commit()
-        else:  
-            break
+        list_danmu = line.strip('\n').replace('/bl@=0','NONE').split('|')
+        if len(list_danmu)!=6:
+            continue
+        else:
+            danmulist.append(tuple(list_danmu))
+        #print('line complete')
+                
+    try:
+        insertcolumn_full="INSERT INTO %s"%(table_name,)+"(id,nickname,level,content,badge,blevel) VALUES(%s,%s,%s,%s,%s,%s)"
+        cursor.executemany(insertcolumn_full,danmulist)#运行 
+
+    except Exception as e:
+        print(e)
+    db.commit()
     return roomid,table_name
 if __name__=='__main__':
     temp,temp2=main()

@@ -4,15 +4,18 @@ Created on Sat Dec 23 10:48:00 2017
 
 @author: KAI
 """
-import re
+import matplotlib as mlp
+import numpy as np
 import pymysql
-import time
 import txt_mysql
 import matplotlib.pyplot as plt
+import Apriori
+mlp.rcParams['font.family']='sans-serif'  
+mlp.rcParams['font.sans-serif']=[u'SimHei']  
 
-rid=687423
-table_name='douyu_danmu_'+str(rid)+'_'+str(time.strftime("%d_%m_%Y"))
-#rid,table_name=txt_mysql.main()
+#rid=687423
+#table_name='douyu_danmu_'+str(rid)+'_'+"25_12_2017"
+rid,table_name=txt_mysql.main()
 db=pymysql.connect(
         host='localhost',
         db='douyu_tv',
@@ -25,19 +28,23 @@ cursor=db.cursor()#数据库游标
 #======总弹幕数========#
 cursor.execute('SELECT count(*) from %s'%(table_name,))
 Total_danmu_num=cursor.fetchone()[0]
+print("总弹幕数:",Total_danmu_num)
 #======总观众数========#
 cursor.execute('SELECT count(DISTINCT id) from %s'%(table_name,))
 Total_pop=cursor.fetchone()[0]
+print("总观众数:",Total_pop)
 #======话痨============#
 #TOP=5
-sql="SELECT nickname,count(*) AS count FROM %s \
+sql="SELECT nickname,id,count(*) AS count FROM %s \
 group by id \
 order by count DESC \
 limit 5"%(table_name,)
 cursor.execute(sql)
 Tops=cursor.fetchall()
+print("话痨榜:",Tops)
 #======前五牌子比例========#
 sql="SELECT badge,count(*) AS count FROM %s \
+where badge<>'NONE'\
 group by badge \
 order by count DESC \
 limit 5"%(table_name,)
@@ -48,13 +55,78 @@ for i in Top_badges:
     labels.append(i[0])
     sizes.append(i[1])
 sizes=[i/sum(sizes)*100 for i in sizes]
-colors='lightcoral','gold','lightskyblue','purple','yellowgreen'
+colors='lightcoral','gold','lightskyblue','yellow','yellowgreen'
 explode=0.5,0.4,0.2,0.2,0
 plt.figure(1)
-plt.pie(tuple(sizes), explode=explode, labels=tuple(labels), colors=colors, autopct='%1.1f%%', shadow=False, startangle=50)
+plt.pie(tuple(sizes), explode=explode, labels=tuple(labels), colors=colors, autopct='%1.1f%%',
+        shadow=True, startangle=50)
 plt.axis('equal')
-plt.show()
+plt.title("前五牌子比例")
+#plt.show()
+plt.savefig('%s TOP5 badge.png'%(table_name,))
 #======等级分布=========#
 sql="SELECT level FROM %s group by id"%(table_name,)
 cursor.execute(sql)
 levels=cursor.fetchall()
+plt.figure(2)
+levels=sorted([int(j[0]) for j in levels])
+lbins=np.arange(min(levels),(max(levels) if max(levels)%2==1 else max(levels)+1),1)
+#levels=np.sort(levels)
+plt.hist(levels,lbins,histtype='bar',facecolor='pink',alpha=0.75,rwidth=0.8)
+plt.xlabel("等级区间")
+plt.ylabel("出现频率") 
+
+plt.title("观众等级分布")
+plt.savefig('%s Audience level.png'%(table_name,))
+#====牌子等级分布========#
+sql="SELECT blevel FROM %s"%(table_name,)+" WHERE badge = %s group by id"
+cursor.execute(sql,(labels[0],))
+blevels=cursor.fetchall()
+print(labels[0]+"的牌子数共",len(blevels))
+plt.figure(3)
+blevels=sorted([int(j[0]) for j in blevels])
+bbins=np.arange(min(blevels),(max(blevels) if max(blevels)%2==1 else max(blevels)+1),1)
+plt.hist(blevels,bbins,histtype='bar',facecolor='blue',alpha=0.75,rwidth=0.8)
+plt.xlabel("等级区间")
+plt.ylabel("出现频率") 
+plt.title("%s牌子等级分布"%(labels[0],))
+plt.savefig('%s badge level.png'%(table_name,))
+#======四字热词========#
+
+MINSUPPORT=0.005 #10%的支持度
+DATA=[]#数据全集
+support_data={}
+K=4
+
+cursor.execute("SELECT content FROM %s"%(table_name,))
+danmu=cursor.fetchall()
+tmp=[]
+danmu_list=[]
+for j in danmu:
+    for i in j:
+        for k in i:
+            tmp.append(k)
+        danmu_list.append(tmp)
+        tmp=[]
+        
+L, support_data = Apriori.generate_L(danmu_list, K, MINSUPPORT,support_data)#4-项集
+print("Starting to create Big_Rules")
+big_rules_list = Apriori.generate_big_rules(L, support_data, min_conf=1.0)
+        
+for Lk in L:
+    print( "="*50)
+    print( "frequent " + str(len(list(Lk)[0])) + "-itemsets\t\tsupport")
+    print( "="*50)
+    bglist={}
+    for freq_set in Lk:
+        bglist[freq_set]=support_data[freq_set]
+    bglist=sorted(bglist.items(),key=lambda item:item[1],reverse=True)
+    count=20#各取频繁项前二十
+    print(bglist[0:count])
+    
+print()
+'''
+print ("Big Rules")
+for item in big_rules_list:
+    print( item[0], "=>", item[1], "conf: ", item[2])
+'''

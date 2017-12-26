@@ -35,6 +35,7 @@ uid_path = re.compile(b'uid@=(.+?)/')
 nickname_path = re.compile(b'nn@=(.+?)/')
 level_path = re.compile(b'level@=([1-9][0-9]?)/')
 badgename_path = re.compile(b'bnn@=(.+?)/')
+badgelevel_path=re.compile(b'bl@=(.+?)/')
 
 def sendmsg(msgstr):
     msg = msgstr.encode('utf-8')
@@ -64,6 +65,7 @@ def starting(roomid):
         level_more = level_path.findall(data)
         danmu_more = danmu_path.findall(data)
         badgename_more=badgename_path.findall(data)
+        badgelevel_more=badgelevel_path.findall(data)
         #print(data)
         if not level_more:
             level_more = b'0'
@@ -79,13 +81,15 @@ def starting(roomid):
                              'nickname':nickname_more[i].decode(errors='ignore'),
                              'level':level_more[i].decode(errors='ignore'),
                              'danmu':danmu_more[i].decode(errors='ignore'),
-                             'badge':badgename_more[i].decode(errors='ignore')
+                             'badge':badgename_more[i].decode(errors='ignore'),
+                             'blevel':badgelevel_more[i].decode(errors='ignore')
                              }
-                    lines=[uid_more[i].decode(errors='ignore')+' ',
-                           nickname_more[i].decode(errors='ignore')+' ',
-                           level_more[i].decode(errors='ignore')+' ',
-                           danmu_more[i].decode(errors='ignore')+' ',
-                           badgename_more[i].decode(errors='ignore')]
+                    lines=[uid_more[i].decode(errors='ignore')+'|',
+                           nickname_more[i].decode(errors='ignore')+'|',
+                           level_more[i].decode(errors='ignore')+'|',
+                           danmu_more[i].decode(errors='ignore')+'|',
+                           badgename_more[i].decode(errors='ignore')+'|',
+                           badgelevel_more[i].decode(errors='ignore')]
                     '''
                     product={'uid':uid_more[i].decode(),
                              'nickname':nickname_more[i].decode(),
