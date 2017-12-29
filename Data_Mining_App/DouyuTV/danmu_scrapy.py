@@ -5,17 +5,14 @@ Created on Wed Dec 20 13:59:18 2017
 @author: KAI
 """
 
-# 这个抓取弹幕,然后把用户的id，昵称，等级，弹幕内容都保存到mongodb中
+# 这个抓取弹幕,然后把用户的id，昵称，等级，弹幕内容都保存到mysql数据库中
 import multiprocessing
 import re
 import socket
 import time
 
-#import pymysql
 import requests
 from bs4 import BeautifulSoup
-#import numpy as np
-#import pandas as pd  
 
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,6 +33,8 @@ nickname_path = re.compile(b'nn@=(.+?)/')
 level_path = re.compile(b'level@=([1-9][0-9]?)/')
 badgename_path = re.compile(b'bnn@=(.+?)/')
 badgelevel_path=re.compile(b'bl@=(.+?)/')
+color_path=re.compile(b'col@=(.+?)/')
+
 
 def sendmsg(msgstr):
     msg = msgstr.encode('utf-8')
@@ -58,6 +57,7 @@ def starting(roomid):
     msg_more = 'type@=joingroup/rid@={}/gid@=-9999/\0'.format(roomid)
     sendmsg(msg_more)
     print("Succeed logging in")
+
     while True:
         data = client.recv(2048)#bytes-like-objects
         uid_more = uid_path.findall(data)
@@ -66,12 +66,24 @@ def starting(roomid):
         danmu_more = danmu_path.findall(data)
         badgename_more=badgename_path.findall(data)
         badgelevel_more=badgelevel_path.findall(data)
+        color_more=color_path.findall(data)
+        #print('color_more',color_more)
+        #print('danmu_more s length',len(danmu_more))
+        #gift_more=gift_path.findall(data)
+        #vip_more=vip_path.findall(data)
         #print(data)
         if not level_more:
             level_more = b'0'
+        if len(color_more)<len(danmu_more):
+            for _ in range(len(danmu_more)-len(color_more)):
+                color_more.append(b'0')
+        elif len(color_more)>len(danmu_more):
+            color_more=color_more[:len(danmu_more)]
+        #print('color_more s length',len(color_more))
+        #print('danmu_more s length',len(danmu_more))
         if not data:
             print("NOT DATA")
-            print(data)
+            #print(data)
             break
             #continue
         else:
@@ -82,14 +94,23 @@ def starting(roomid):
                              'level':level_more[i].decode(errors='ignore'),
                              'danmu':danmu_more[i].decode(errors='ignore'),
                              'badge':badgename_more[i].decode(errors='ignore'),
-                             'blevel':badgelevel_more[i].decode(errors='ignore')
+                             'blevel':badgelevel_more[i].decode(errors='ignore'),
+                             #'gift':gift_more[i].decode(errors='ignore'),
+                             #'vip_c':vip_more[i].decode(errors='ignore'),
+                             'color':color_more[i].decode(errors='ignore')
                              }
+                    
                     lines=[uid_more[i].decode(errors='ignore')+'|',
                            nickname_more[i].decode(errors='ignore')+'|',
                            level_more[i].decode(errors='ignore')+'|',
                            danmu_more[i].decode(errors='ignore')+'|',
                            badgename_more[i].decode(errors='ignore')+'|',
-                           badgelevel_more[i].decode(errors='ignore')]
+                           badgelevel_more[i].decode(errors='ignore')+'|',
+                           #gift_more[i].decode(errors='ignore')+'|',
+                           #vip_more[i].decode(errors='ignore')+'|',
+                           color_more[i].decode(errors='ignore')
+                           ]
+                    
                     '''
                     product={'uid':uid_more[i].decode(),
                              'nickname':nickname_more[i].decode(),
@@ -103,17 +124,23 @@ def starting(roomid):
                            danmu_more[i].decode()+' ',
                            badgename_more[i].decode()]
                     '''
-                    my_file=open(str(roomid)+'.txt','a+')
+                    
+                    my_file=open(str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))+'.txt','a+')
                     my_file.writelines(lines)
                     my_file.write('\n')
-                    my_file.close()
+                    time.sleep(0.1)
+
+                    
                     print(product)
                     
                     
                 except Exception as e:
+                    #print('color_more s length',len(color_more))
+                    #print('danmu_more s length',len(danmu_more))
                     print(e)
                     continue
     #client.close()
+    my_file.close()
     print("成功写入TXT")
 
 

@@ -21,14 +21,15 @@ def main():
         print("data base has already connected")
 
     roomid=input('输入房间号：')
-    txt = open(str(roomid)+'.txt','r',encoding='gbk')
+    txt = open(str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))+'.txt','r',encoding='gbk')
     table_name='douyu_danmu_'+str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))
     sql="CREATE TABLE IF NOT EXISTS %s"%(table_name,)+"(id varchar(1024),\
     nickname varchar(1024),\
     level varchar(128),\
     content varchar(2048),\
     badge varchar(1024),\
-    blevel varchar(128))DEFAULT CHARSET gbk"
+    blevel varchar(128),\
+    color varchar(128))DEFAULT CHARSET gbk"
     
     cursor.execute(sql)
     cursor.execute('delete from %s'%(table_name,))
@@ -36,14 +37,14 @@ def main():
     for line in txt.readlines():#按行读取且处理掉换行符，效果:"\'\n'变为了''
         #line = line.encode('utf8')
         list_danmu = line.strip('\n').replace('/bl@=0','NONE').split('|')
-        if len(list_danmu)!=6:
+        if len(list_danmu)!=7:#项目数
             continue
         else:
             danmulist.append(tuple(list_danmu))
         #print('line complete')
                 
     try:
-        insertcolumn_full="INSERT INTO %s"%(table_name,)+"(id,nickname,level,content,badge,blevel) VALUES(%s,%s,%s,%s,%s,%s)"
+        insertcolumn_full="INSERT INTO %s"%(table_name,)+"(id,nickname,level,content,badge,blevel,color) VALUES(%s,%s,%s,%s,%s,%s,%s)"
         cursor.executemany(insertcolumn_full,danmulist)#运行 
 
     except Exception as e:
