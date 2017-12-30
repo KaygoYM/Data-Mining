@@ -22,7 +22,7 @@ def main():
 
     roomid=input('输入房间号：')
     txt = open(str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))+'.txt','r',encoding='gbk')
-    table_name='douyu_danmu_'+str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))
+    table_name='douyu_danmu_'+str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))#create table
     sql="CREATE TABLE IF NOT EXISTS %s"%(table_name,)+"(id varchar(1024),\
     nickname varchar(1024),\
     level varchar(128),\
