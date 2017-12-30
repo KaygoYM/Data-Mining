@@ -8,9 +8,10 @@ Created on Wed Dec 20 13:59:18 2017
 # 这个抓取弹幕,然后把用户的id，昵称，等级，弹幕内容都保存到mysql数据库中
 import multiprocessing
 import re
+import json
 import socket
 import time
-
+import urllib
 import requests
 from bs4 import BeautifulSoup
 
@@ -19,15 +20,8 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostbyname("openbarrage.douyutv.com")
 port = 8601
 client.connect((host, port))
-#setsockopt(client,SOL_SOCKET,SO_KEEPALIVE,true)
-'''
-danmu_path = re.compile(b'txt@=(.+?)/cid@')
-uid_path = re.compile(b'uid@=(.+?)/nn@')
-nickname_path = re.compile(b'nn@=(.+?)/txt@')
-level_path = re.compile(b'level@=([1-9][0-9]?)/sahf')
-badgename_path = re.compile(b'bnn@=(.+?)/bl@')
-'''
-danmu_path = re.compile(b'txt@=(.+?)/')
+
+danmu_path = re.compile(b'txt@=(.+?)/')#正则表达式
 uid_path = re.compile(b'uid@=(.+?)/')
 nickname_path = re.compile(b'nn@=(.+?)/')
 level_path = re.compile(b'level@=([1-9][0-9]?)/')
@@ -69,8 +63,6 @@ def starting(roomid):
         color_more=color_path.findall(data)
         #print('color_more',color_more)
         #print('danmu_more s length',len(danmu_more))
-        #gift_more=gift_path.findall(data)
-        #vip_more=vip_path.findall(data)
         #print(data)
         if not level_more:
             level_more = b'0'
@@ -109,22 +101,8 @@ def starting(roomid):
                            #gift_more[i].decode(errors='ignore')+'|',
                            #vip_more[i].decode(errors='ignore')+'|',
                            color_more[i].decode(errors='ignore')
-                           ]
-                    
-                    '''
-                    product={'uid':uid_more[i].decode(),
-                             'nickname':nickname_more[i].decode(),
-                             'level':level_more[i].decode(),
-                             'danmu':danmu_more[i].decode(),
-                             'badge':badgename_more[i].decode()
-                             }
-                    lines=[uid_more[i].decode()+' ',
-                           nickname_more[i].decode()+' ',
-                           level_more[i].decode()+' ',
-                           danmu_more[i].decode()+' ',
-                           badgename_more[i].decode()]
-                    '''
-                    
+                           ]                   
+                     
                     my_file=open(str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))+'.txt','a+')
                     my_file.writelines(lines)
                     my_file.write('\n')
@@ -135,8 +113,6 @@ def starting(roomid):
                     
                     
                 except Exception as e:
-                    #print('color_more s length',len(color_more))
-                    #print('danmu_more s length',len(danmu_more))
                     print(e)
                     continue
     #client.close()
@@ -158,11 +134,46 @@ def get_name(roomid):
     soup = BeautifulSoup(r.text, 'lxml')
     return soup.find('a', {'class', 'zb-name'}).string
 
+def get_room_info(roomid,):
+    while True:
+        headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+        #伪装headers
+        chaper_url='http://open.douyucdn.cn/api/RoomApi/room/'+str(roomid)
+
+        req = urllib.request.Request(url=chaper_url, headers=headers)  
+        page=urllib.request.urlopen(req)  
+        html=page.read()
+            #print(html)
+            #print(type(html))
+        room_info=json.loads(html.decode('utf-8'))['data']
+
+            #for i in room_info:
+        hot=room_info['hn']
+        fans=room_info['fans_num']
+            #gift=json.loads(room_info['gift'])
+        
+        lines=[str(hot)+'|',str(fans)+'|']
+        my_file=open(str(roomid)+'_'+str(time.strftime("%d_%m_%Y"))+'room_gift.txt','a+')
+        my_file.writelines(lines)
+        my_file.write('\n')
+        print('room_info get')
+        time.sleep(0.2)
+        my_file.close()
+        time.sleep(300)
+        
+
 
 if __name__ == '__main__':
     room_id = input('请出入房间ID： ')
     p2 = multiprocessing.Process(target=keeplive)
     p2.start()
+    
+    #global sum_rocket
+    #global sum_plane
+    #sum_rocket=0
+    #sum_plane=0
+    p3 = multiprocessing.Process(target=get_room_info,args=(room_id,))
+    p3.start()
     while True:
         p1 = multiprocessing.Process(target=starting, args=(room_id,))
         p1.start()

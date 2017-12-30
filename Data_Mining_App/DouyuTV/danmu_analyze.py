@@ -6,6 +6,7 @@ Created on Sat Dec 23 10:48:00 2017
 """
 import matplotlib as mlp
 import numpy as np
+import time
 import pymysql
 import txt_mysql
 import matplotlib.pyplot as plt
@@ -14,8 +15,8 @@ import translate_to_color
 mlp.rcParams['font.family']='sans-serif'  
 mlp.rcParams['font.sans-serif']=[u'SimHei']  
 
-#rid=687423
-#table_name='douyu_danmu_'+str(rid)+'_'+"25_12_2017"
+#rid=156277
+#table_name='douyu_danmu_'+str(rid)+'_'+"29_12_2017"
 rid,table_name=txt_mysql.main()
 db=pymysql.connect(
         host='localhost',
@@ -81,7 +82,7 @@ plt.pie(tuple(sizes), explode=explode, labels=tuple(labels), colors=colors, auto
 plt.axis('equal')
 plt.title("前五牌子比例")
 plt.show()
-#plt.savefig('%s TOP5 badge.png'%(table_name,))
+plt.savefig('%s TOP5 badge.png'%(table_name,))
 
 #======等级分布======right===#
 sql="SELECT level FROM %s Group by id"%(table_name,)
@@ -89,6 +90,7 @@ cursor.execute(sql)
 levels=cursor.fetchall()
 plt.figure(2)
 levels=sorted([int(j[0]) for j in levels])
+print("平均观众等级：%1.1f"%(np.mean(levels)))
 lbins=np.arange(min(levels),(max(levels) if max(levels)%2==1 else max(levels)+1),1)
 #levels=np.sort(levels)
 plt.hist(levels,lbins,histtype='bar',facecolor='pink',alpha=0.75,rwidth=0.8)
@@ -97,7 +99,7 @@ plt.ylabel("出现频率")
 
 plt.title("观众等级分布")
 plt.show()
-#plt.savefig('%s Audience level.png'%(table_name,))
+plt.savefig('%s Audience level.png'%(table_name,))
 
 #====牌子等级分布====right====#
 sql="SELECT blevel FROM %s"%(table_name,)+" WHERE badge = %s Group by id"
@@ -105,13 +107,14 @@ cursor.execute(sql,(labels[0],))
 blevels=cursor.fetchall()
 plt.figure(3)
 blevels=sorted([int(j[0]) for j in blevels])
+print("牌子的平均等级：%1.1f"%(np.mean(blevels)))
 bbins=np.arange(min(blevels),(max(blevels) if max(blevels)%2==1 else max(blevels)+1),1)
 plt.hist(blevels,bbins,histtype='bar',facecolor='blue',alpha=0.75,rwidth=0.8)
 plt.xlabel("等级区间")
 plt.ylabel("出现频率") 
 plt.title("%s牌子等级分布"%(labels[0]))
 plt.show()
-#plt.savefig('%s badge level.png'%(table_name,))
+plt.savefig('%s badge level.png'%(table_name,))
 
 #======自聚类======right?=====#
 sql="SELECT blevel,level FROM %s"%(table_name,)+" WHERE badge = %s Group by id"
@@ -128,14 +131,42 @@ for i in range(len(x)):
     y[i]=1 if x[i,0]<x[i,1] else 0
 plt.figure(4)
 plt.scatter(x[:,0],x[:,1],c=np.squeeze(y),s=20,cmap='RdYlBu')
-X=np.linspace(min(x[:,0]),max(x[:,1]),30)
+X=np.linspace(0,max(x[:,1]),30)
 plt.plot(X,X,'k-')
+plt.xlim((min(x[:,0])-2,max(x[:,0])+2))
 plt.xlabel("牌子等级")
 plt.ylabel("用户等级")
 plt.show()
-#plt.savefig('%s badge and level.png'%(table_name,))
-'''
+plt.savefig('%s badge and level.png'%(table_name,))
+
+#=====关注数变化====热度变化====#
+roominformation=open(str(rid)+'_'+str(time.strftime("%d_%m_%Y"))+'room_gift.txt','r',encoding='gbk')
+hot=[]
+fans=[]
+for line in roominformation.readlines():#按行读取且处理掉换行符，效果:"\'\n'变为了''
+    list_roominfo = line.strip('\n').split('|')
+    fans.append(int(list_roominfo[1]))
+    hot.append(int(list_roominfo[0]))
+
+#plt.figure(5)
+fig,ax1 = plt.subplots()
+ax2 = ax1.twinx()
+ax1.plot(fans, 'r*-',label='热度')
+ax2.plot(hot, 'm^-',label='关注数')
+ax1.set_xlabel('时间序列')
+ax1.set_ylabel('关注数')
+ax2.set_ylabel('热度')
+ax1.legend(loc=1) 
+ax2.legend(loc=2)
+#ax1.set_yticks(range(min(hot),max(hot),100))
+#ax2.set_yticks(range(min(fans),max(fans),100))
+
+plt.title("主播热度和关注变化")
+plt.show()
+plt.savefig('%s hot and fans.png'%(table_name,))
+
 #======四字热词========#
+
 MINSUPPORT=0.005 #10%的支持度
 DATA=[]#数据全集
 support_data={}
@@ -168,7 +199,7 @@ for Lk in L:
     print(bglist[0:count])
     
 print()
-'''
+
 '''
 print ("Big Rules")
 for item in big_rules_list:
