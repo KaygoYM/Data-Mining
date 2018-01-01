@@ -151,8 +151,13 @@ for line in roominformation.readlines():#按行读取且处理掉换行符，效
 #plt.figure(5)
 fig,ax1 = plt.subplots()
 ax2 = ax1.twinx()
+<<<<<<< HEAD
 ax1.plot(fans, 'r*-',label='关注数')
 ax2.plot(hot, 'm^-',label='热度')
+=======
+ax1.plot(fans, 'r*-',label='热度')
+ax2.plot(hot, 'm^-',label='关注数')
+>>>>>>> d403cd81acaa2246a776cf2d04cd0a94813b0fe0
 ax1.set_xlabel('时间序列')
 ax1.set_ylabel('关注数')
 ax2.set_ylabel('热度')
